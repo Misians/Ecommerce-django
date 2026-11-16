@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Django E-Commerce CRUD & REST API Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      min-height: 100vh;
+    }
+    .topbar {
+      background: #092e20;
+      color: #ffffff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #10b981;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .dj-badge {
+      background: #10b981;
+      color: #064e3b;
+      font-weight: 900;
+      font-size: 1rem;
+      padding: 0.45rem 0.7rem;
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .brand h1 {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+    .brand p {
+      font-size: 0.76rem;
+      color: #a7f3d0;
+    }
+    .api-badges {
+      display: flex;
+      gap: 0.6rem;
+    }
+    .api-pill {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #d1fae5;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 1.75rem auto;
+      padding: 0 1.5rem;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
+    .stat-card span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+      letter-spacing: 0.04em;
+    }
+    .stat-card strong {
+      display: block;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 0.35rem;
+    }
+    .stat-card small {
+      color: #059669;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 1.5rem;
+    }
+    .panel {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .panel-head h2 {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+    .btn-add {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      text-align: left;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: #64748b;
+      padding: 0.7rem 0.75rem;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    td {
+      padding: 0.85rem 0.75rem;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.86rem;
+    }
+    .slug-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #475569;
+    }
+    .stock-badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .stock-low {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .api-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 1.15rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      margin-top: 0.75rem;
+    }
+    .method-get {
+      background: #059669;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.7rem;
+      margin-right: 6px;
+    }
+    .method-post {
+      background: #2563eb;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.7rem;
+      margin-right: 6px;
+    }
+    .endpoint-item {
+      padding: 0.65rem 0.8rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      margin-bottom: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="dj-badge">dj</div>
+      <div>
+        <h1>Ecommerce-Django — Store & Accounts CRUD API</h1>
+        <p>Django 5 + Django REST Framework + JWT Auth & Permissão Granular</p>
+      </div>
+    </div>
+    <div class="api-badges">
+      <span class="api-pill">/api/store/products/</span>
+      <span class="api-pill">/api/auth/login/</span>
+      <span class="api-pill">SQLite / PostgreSQL Ready</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="stats-row">
+      <div class="stat-card">
+        <span>Total de Produtos (Model Product)</span>
+        <strong>24 SKUs</strong>
+        <small>✓ Sincronizado com Serializer</small>
+      </div>
+      <div class="stat-card">
+        <span>Estoque Total Ativo</span>
+        <strong>318 un.</strong>
+        <small>✓ Controle automático de saldo</small>
+      </div>
+      <div class="stat-card">
+        <span>Permissão de Leitura</span>
+        <strong>AllowAny</strong>
+        <small>GET /list & /retrieve públicos</small>
+      </div>
+      <div class="stat-card">
+        <span>Escrita & Mutação</span>
+        <strong>IsAdminUser</strong>
+        <small>POST / PUT / DELETE protegidos</small>
+      </div>
+    </section>
+
+    <section class="layout-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Catálogo de Produtos (`store.models.Product`)</h2>
+          <button class="btn-add">+ Novo Produto (POST)</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Produto (`name`)</th>
+              <th>Slug Único (`slug`)</th>
+              <th>Preço (`price`)</th>
+              <th>Estoque (`stock`)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#01</td>
+              <td><strong>Kit Robótica Educacional ESP32</strong></td>
+              <td><span class="slug-code">kit-robotica-esp32</span></td>
+              <td><strong>R$ 289,90</strong></td>
+              <td><span class="stock-badge">42 em estoque</span></td>
+            </tr>
+            <tr>
+              <td>#02</td>
+              <td><strong>Teclado Mecânico Wireless Dev Pro</strong></td>
+              <td><span class="slug-code">teclado-mecanico-dev-pro</span></td>
+              <td><strong>R$ 459,00</strong></td>
+              <td><span class="stock-badge">19 em estoque</span></td>
+            </tr>
+            <tr>
+              <td>#03</td>
+              <td><strong>Monitor Ultrawide 29" IPS 100Hz</strong></td>
+              <td><span class="slug-code">monitor-ultrawide-29-ips</span></td>
+              <td><strong>R$ 1.199,00</strong></td>
+              <td><span class="stock-badge stock-low">5 em estoque</span></td>
+            </tr>
+            <tr>
+              <td>#04</td>
+              <td><strong>Headset Noise Cancelling Studio</strong></td>
+              <td><span class="slug-code">headset-anc-studio</span></td>
+              <td><strong>R$ 379,50</strong></td>
+              <td><span class="stock-badge">28 em estoque</span></td>
+            </tr>
+            <tr>
+              <td>#05</td>
+              <td><strong>Raspberry Pi 5 8GB Starter Kit</strong></td>
+              <td><span class="slug-code">raspberry-pi-5-8gb-kit</span></td>
+              <td><strong>R$ 749,90</strong></td>
+              <td><span class="stock-badge">14 em estoque</span></td>
+            </tr>
+            <tr>
+              <td>#06</td>
+              <td><strong>Webcam Full HD 1080p 60FPS Autofoco</strong></td>
+              <td><span class="slug-code">webcam-fullhd-60fps</span></td>
+              <td><strong>R$ 219,00</strong></td>
+              <td><span class="stock-badge">36 em estoque</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Endpoints DRF & Resposta JSON</h2>
+        </div>
+        <div class="endpoint-item">
+          <div><span class="method-get">GET</span> /api/store/products/</div>
+          <span style="color:#059669;font-weight:700">200 OK</span>
+        </div>
+        <div class="endpoint-item">
+          <div><span class="method-post">POST</span> /api/store/products/</div>
+          <span style="color:#2563eb;font-weight:700">201 Created</span>
+        </div>
+        <div class="endpoint-item">
+          <div><span class="method-post">POST</span> /api/auth/register/</div>
+          <span style="color:#059669;font-weight:700">Auth Ready</span>
+        </div>
+
+        <div class="api-box">
+<pre>{
+  "count": 24,
+  "results": [
+    {
+      "id": 1,
+      "name": "Kit Robótica Educacional ESP32",
+      "slug": "kit-robotica-esp32",
+      "description": "Kit completo com sensores e Wi-Fi/BLE",
+      "price": "289.90",
+      "stock": 42,
+      "created_at": "2026-11-16T13:20:00Z"
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
